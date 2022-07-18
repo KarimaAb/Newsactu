@@ -3,11 +3,11 @@
 namespace App\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
  * @Route("/admin")
@@ -22,8 +22,8 @@ class AdminController extends AbstractController
         return $this->render("admin/show_dashboard.html.twig");
     }
 
-#    public funtion createArticle($Request $request, EntityManagerInferface $entityManager, SluggerInterface $slugger): Response
-#    {
-        
-#    }
+    public function createArticle(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
+    {
+
+    }
 }
