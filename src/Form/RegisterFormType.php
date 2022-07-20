@@ -9,6 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 
 class RegisterFormType extends AbstractType
 {
@@ -18,7 +19,7 @@ class RegisterFormType extends AbstractType
             ->add('email', EmailType::class, [
                 'label' => 'E-mail'
             ])
-            ->add('password', PassewordType::class, [
+            ->add('password', PasswordType::class, [
                 'label' => 'Mot de passe'
             ])
             ->add('firstname', TextType::class, [
