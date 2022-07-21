@@ -7,13 +7,13 @@ use App\Form\ArticleFormType;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 /**
@@ -34,10 +34,9 @@ class AdminController extends AbstractController
         try {
             $this->denyAccessUnlessGranted('ROLE_ADMIN');
         } catch (AccessDeniedException $exception) {
-            $this->addFlash('warning', 'Cette partie du site est réservée au admins');
+            $this->addFlash('warning', 'Cette partie du site est réservée aux admins');
             return $this->redirectToRoute('default_home');
         }
-
 
         $articles = $entityManager->getRepository(Article::class)->findBy(['deletedAt' => null]);
 
@@ -58,7 +57,7 @@ class AdminController extends AbstractController
         $form = $this->createForm(ArticleFormType::class, $article)
             ->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if($form->isSubmitted() && $form->isValid()) {
 
             $article->setCreatedAt(new DateTime());
             $article->setUpdateAt(new DateTime());
@@ -70,12 +69,12 @@ class AdminController extends AbstractController
             $photo = $form->get('photo')->getData();
 
             # Si une photo a été uploadée dans le formulaire on va faire le traitement nécessaire à son stockage dans notre projet.
-            if ($photo) {
+            if($photo) {
                 # Déconstructioon
                 $extension = '.' . $photo->guessExtension();
                 $originalFilename = pathinfo($photo->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename = $slugger->slug($originalFilename);
-                //                $safeFilename = $article->getAlias();
+//                $safeFilename = $article->getAlias();
 
                 # Reconstruction
                 $newFilename = $safeFilename . '_' . uniqid() . $extension;
@@ -83,19 +82,21 @@ class AdminController extends AbstractController
                 try {
                     $photo->move($this->getParameter('uploads_dir'), $newFilename);
                     $article->setPhoto($newFilename);
-                } catch (FileException $exception) {
+                }
+                catch(FileException $exception) {
                     # Code à exécuter en cas d'erreur.
                 }
             } # end if($photo)
 
-            # Ajout d'un auteur à l'article (User récupéré depuis la session)
-            $article->setAuthor($this->getUser());
+                # Ajout d'un auteur à l'article (User récupéré depuis la session)
+                $article->setAuthor($this->getUser());
 
-            $entityManager->persist($article);
-            $entityManager->flush();
+                $entityManager->persist($article);
+                $entityManager->flush();
 
-            $this->addFlash('success', "L'article est en ligne avec succès !");
-            return $this->redirectToRoute('show_dashboard');
+                $this->addFlash('success', "L'article est en ligne avec succès !");
+                return $this->redirectToRoute('show_dashboard');
+
         } # end if ($form)
 
         # 3 - Création de la vue
@@ -116,10 +117,8 @@ class AdminController extends AbstractController
             'photo' => $originalPhoto
         ])->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if($form->isSubmitted() && $form->isValid()) {
 
-
-            $article->setCreatedAt(new DateTime());
             $article->setUpdateAt(new DateTime());
 
             # L'alias sera utilisé dans l'url (comme FranceTvInfo) et donc doit être assaini de tout accents et espaces.
@@ -129,13 +128,13 @@ class AdminController extends AbstractController
             $photo = $form->get('photo')->getData();
 
             # Si une photo a été uploadée dans le formulaire on va faire le traitement nécessaire à son stockage dans notre projet.
-            if ($photo) {
+            if($photo) {
 
                 # Déconstructioon
                 $extension = '.' . $photo->guessExtension();
                 $originalFilename = pathinfo($photo->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename = $slugger->slug($originalFilename);
-                //                $safeFilename = $article->getAlias();
+//                $safeFilename = $article->getAlias();
 
                 # Reconstruction
                 $newFilename = $safeFilename . '_' . uniqid() . $extension;
@@ -143,12 +142,13 @@ class AdminController extends AbstractController
                 try {
                     $photo->move($this->getParameter('uploads_dir'), $newFilename);
                     $article->setPhoto($newFilename);
-                } catch (FileException $exception) {
+                }
+                catch(FileException $exception) {
                     # Code à exécuter en cas d'erreur.
                 }
             } else {
                 $article->setPhoto($originalPhoto);
-            }
+            } # end if($photo)
 
             # Ajout d'un auteur à l'article (User récupéré depuis la session)
             $article->setAuthor($this->getUser());
@@ -165,7 +165,7 @@ class AdminController extends AbstractController
             'form' => $form->createView(),
             'article' => $article
         ]);
-    } # end function updateArticle
+    }# end function updateArticle
 
     /**
      * @Route("/archiver-un-article_{id}", name="soft_delete_article", methods={"GET"})
@@ -177,7 +177,21 @@ class AdminController extends AbstractController
         $entityManager->persist($article);
         $entityManager->flush();
 
-        $this->addFlash('success', "L'article a bien été archivé.");
+        $this->addFlash('success', "L'article a bien été archivé");
+        return $this->redirectToRoute('show_dashboard');
+    }# end function softDelete
+
+    /**
+     * @Route("/restaurer-un-article_{id}", name="restore_article", methods={"GET"})
+     */
+    public function restoreArticle(Article $article, EntityManagerInterface $entityManager): RedirectResponse
+    {
+        $article->setDeletedAt(null);
+
+        $entityManager->persist($article);
+        $entityManager->flush();
+
+        $this->addFlash('success', "L'article a bien été restauré");
         return $this->redirectToRoute('show_dashboard');
     }
 
@@ -198,7 +212,7 @@ class AdminController extends AbstractController
      */
     public function hardDeleteArticle(Article $article, EntityManagerInterface $entityManager): RedirectResponse
     {
-        // suppression manuelle de la photo
+        // Suppression manuelle de la photo
         $photo = $article->getPhoto();
 
         // On utilise la fonction native de PHP unlink() pour supprimer un fichier dans le filesystem
