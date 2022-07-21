@@ -56,4 +56,50 @@
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-6">
+            <h2 class="text-center">Toutes les catégories</h2>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nom</th>
+                    <th>Alias</th>
+                    <th>Créée le</th>
+                    <th>Modifié le</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                    {% for category in categories %}
+                        <tr>
+                            <td>{{ category.id }}</td>
+                            <td>{{ category.name}}</td>
+                            <td>{{ category.alias }}</td>
+                            <td>{{ category.createdAt | date('d/m/Y') }}</td>
+                            <td>{{ category.updateAt | date('d/m/Y') }}</td>
+                            
+                                {% if category.deletedAt is null %}
+                                    <td class="">
+                                        <a href="{{ path('update_category', {"id": category.id}) }}" class="text-info" title="Modifier la catégorie"><i class="fa fa-edit"></i></a>
+                                        <a href="{{ path('soft_delete_category', {'id': category.id}) }}" class="text-danger" title="Archiver la catégorie" onclick="return confirm('Voulez-vous archiver cette catégorie ?')"><i class="fa fa-trash"></i></a>
+                                    </td>
+                                {% else %}
+                                    <td class="warning">
+                                        <a href="{{ path('restore_category', {'id': category.id}) }}" class="text-primary" title="Restaurer une catégorie" onclick="return confirm('Voulez-vous restaurer cette catégorie ?')"><i class="fa-solid fa-trash-arrow-up"></i></a>
+                                        <a href="{{ path('hard_delete_category', {'id': category.id}) }}" class="text-danger" title="Supprimer définitivement la catégorie" onclick="return confirm('Voulez-vous supprimer définitivement cette catégorie ?')"><i class="fa fa-times-circle"></i></a>
+                                    </td>
+                                {% endif %}
+                        </tr>
+                    {% else %}
+                        
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="col-6"></div>
+    </div>
+
 {% endblock %}

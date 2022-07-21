@@ -2,19 +2,20 @@
 
 namespace App\Controller;
 
-use App\Entity\Article;
-use App\Form\ArticleFormType;
 use DateTime;
+use App\Entity\Article;
+use App\Entity\Category;
+use App\Form\ArticleFormType;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * @Route("/admin")
@@ -39,9 +40,11 @@ class AdminController extends AbstractController
         }
 
         $articles = $entityManager->getRepository(Article::class)->findBy(['deletedAt' => null]);
+        $categories = $entityManager->getRepository(Category::class)->findAll;
 
         return $this->render("admin/show_dashboard.html.twig", [
             'articles' => $articles,
+            'categories' => $categories
         ]);
     }
 
