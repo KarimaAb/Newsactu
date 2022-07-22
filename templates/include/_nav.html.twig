@@ -12,13 +12,14 @@
 
 				{% if not app.user %}
 					<li class="nav-item">
-						<a class="nav-link" href="#">S'inscrire</a>
+						<a class="nav-link" href="{{ path('user_register') }}">S'inscrire</a>
 					</li>
 					<li class="nav-item">
 						<a class="nav-link" href="{{ path('app_login') }}">Se connecter</a>
 					</li>
+				{% else %}
 					<li class="nav-item">
-						<a class="nav-link" href="#">Espace perso</a>
+						<a class="nav-link" href="{{ path('show_profile') }}">Espace perso</a>
 					</li>
 					<li class="nav-item">
 						<a class="nav-link" href="{{ path('app_logout') }}">Se déconnecter</a>
@@ -32,30 +33,37 @@
 						</a>
 						<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 							<li>
-								<a class="dropdown-item" href="#">Dashboard</a>
+								<a class="dropdown-item" href="{{ path('show_dashboard') }}">Dashboard</a>
 							</li>
 							<li>
-								<a class="dropdown-item" href="#">Ajouter un article</a>
+								<a class="dropdown-item" href="{{ path('create_article') }}">Ajouter un article</a>
 							</li>
 							<li>
-								<a class="dropdown-item" href="#">Ajouter une catégorie</a>
+								<a class="dropdown-item" href="{{ path('create_category') }}">Ajouter une catégorie</a>
 							</li>
 						</ul>
-					{% endif %}
-				</li>
+					</li>
+				{% endif %}
+
 			</ul>
 		</div>
 	</div>
 
 	{% if app.user %}
 
+		<div class="text-nowrap">Vous êtes connecté
+			{{ app.user.firstname }}
+			en tant que :
+			<span class="text-warning">{{ app.user.roles | first }}</span>
+		</div>
 
-		{# <div class="text-nowrap">Vous étes connecté
-					{{ app.user.firstname }}
-					en tant que :
-					<span class="text-warning"></span>
-				</div> #}
+		{% endif%}
+	</nav>
 
-	{% endif %}
+	<div class="bg-light">
+		{# Lorsque vous n'avez pas de route dans votre action et qu'il n'y a pas de paramètre, on utilisera la fonction Twig render() et la fonction controller(). L'appel de l'action se fera de manière statique, et il faudra renseigner le namespace du Controller. Vous DEVREZ mettre 2 back-slashs pour cet appel. #}
+		{# {{ render(controller('App\\Controller\\RenderController::renderCategoriesInNav')) }} #}
 
-</nav>
+	{{ render(url("render_categories_in_nav")) }}
+
+</div>
